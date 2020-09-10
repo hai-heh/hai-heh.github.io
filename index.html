@@ -174,7 +174,7 @@
       
         <h2 id="ReentrantLock的数据结构"><a href="#ReentrantLock的数据结构" class="headerlink" title="ReentrantLock的数据结构"></a>ReentrantLock的数据结构</h2><h3 id="同步状态量state"><a href="#同步状态量state" class="headerlink" title="同步状态量state"></a>同步状态量state</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">private volatile int state;</span><br></pre></td></tr></table></figure>
 <p>0表示没有加锁，1表示已经加锁，大于1表示可重入</p>
-<h3 id="AQS队列"><a href="#AQS队列" class="headerlink" title="AQS队列"></a>AQS队列</h3><img src="https://images2018.cnblogs.com/blog/1422237/201808/1422237-20180805183911414-329333235.png" width="25%" height="25%" />
+<h3 id="AQS队列"><a href="#AQS队列" class="headerlink" title="AQS队列"></a>AQS队列</h3><img src="https://images2018.cnblogs.com/blog/1422237/201808/1422237-20180805183911414-329333235.png" width="50%" height="50%" />
 
 <p>AQS中同步等待队列的实现是一个带头尾指针(这里用指针表示引用是为了后面讲解源码时可以更直观形象,<br>况且引用本身是一种受限的指针)且不带哨兵结点(后文中的头结点表示队列首元素结点,不是指哨兵结点)的双向链表。<br>头结点表示获取到锁的节点，后面节点将会自旋或被阻塞</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">volatile Node prev; &#x2F;&#x2F;指向前一个结点的指针</span><br><span class="line">volatile Node next; &#x2F;&#x2F;指向后一个结点的指针</span><br><span class="line">volatile Thread thread; &#x2F;&#x2F;当前结点代表的线程</span><br><span class="line">volatile int waitStatus; &#x2F;&#x2F;当前节点的状态</span><br></pre></td></tr></table></figure>
