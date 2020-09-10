@@ -6,15 +6,26 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Archives | Hexo</title>
+  <title>run-memory | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://yoursite.com/archives/index.html">
+  <meta name="description" content="jvm运行时数据划分几个区域 程序计数器 虚拟机栈 本地方法栈 java堆 方法区     程序计数器   程序计数器可以看做字节码行号指示器，字节码执行时通过改变程序计数器的方法区确定下一条指令的行号，来实现字节码指令的循环，分支，跳转，异常处理。在多线程的环境下，是宏观上并行，微观上并行，所以需要每一个线程都要保留自己指令，所以每一个线程都需要有自己的程序计数器，互相独立，所以程序计数器被划分">
+<meta property="og:type" content="article">
+<meta property="og:title" content="run-memory">
+<meta property="og:url" content="http://yoursite.com/2020/09/10/run-memory/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="jvm运行时数据划分几个区域 程序计数器 虚拟机栈 本地方法栈 java堆 方法区     程序计数器   程序计数器可以看做字节码行号指示器，字节码执行时通过改变程序计数器的方法区确定下一条指令的行号，来实现字节码指令的循环，分支，跳转，异常处理。在多线程的环境下，是宏观上并行，微观上并行，所以需要每一个线程都要保留自己指令，所以每一个线程都需要有自己的程序计数器，互相独立，所以程序计数器被划分">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://images.cnitblog.com/i/288799/201405/281726404166686.jpg">
+<meta property="og:image" content="https://img-blog.csdn.net/20131226151744250">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20181213130250954.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2N0d3kyOTEzMTQ=,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190417214133394.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dvZGVtYWxl,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190417214138689.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dvZGVtYWxl,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdn.net/20180812235058303?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2JydWNlMTI4/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70">
+<meta property="article:published_time" content="2020-09-10T03:08:43.000Z">
+<meta property="article:modified_time" content="2020-09-10T03:13:31.680Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://images.cnitblog.com/i/288799/201405/281726404166686.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -150,141 +161,215 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
+            <article id="post-run-memory" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
   
+    <h1 class="article-title" itemprop="name">
+      run-memory
+    </h1>
   
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2020" class="archive-year">2020</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/09/10/run-memory/" class="archive-article-date">
+
+        
+        <a href="/2020/09/10/run-memory/" class="archive-article-date">
   	<time datetime="2020-09-10T03:08:43.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-09-10</time>
 </a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/09/10/run-memory/">run-memory</a>
-    </h1>
-  
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="jvm运行时数据划分几个区域"><a href="#jvm运行时数据划分几个区域" class="headerlink" title="jvm运行时数据划分几个区域"></a>jvm运行时数据划分几个区域</h2><ul>
+<li>程序计数器</li>
+<li>虚拟机栈</li>
+<li>本地方法栈</li>
+<li>java堆</li>
+<li>方法区</li>
+</ul>
+<img src="http://images.cnitblog.com/i/288799/201405/281726404166686.jpg" width="25%" height="25%" />
+<img src="https://img-blog.csdn.net/20131226151744250" width="25%" height="25%" />
 
-        <div class="article-info info-on-right">
-          
-          
+<h3 id="程序计数器"><a href="#程序计数器" class="headerlink" title="程序计数器"></a>程序计数器</h3><img src="https://img-blog.csdnimg.cn/20181213130250954.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2N0d3kyOTEzMTQ=,size_16,color_FFFFFF,t_70" width="25%" height="25%" />
 
+
+<p>程序计数器可以看做字节码行号指示器，字节码执行时通过改变程序计数器的方法区确定下一条指令的行号，<br>来实现字节码指令的循环，分支，跳转，异常处理。<br>在多线程的环境下，是宏观上并行，微观上并行，所以需要每一个线程都要保留自己指令，所以每一个线程<br>都需要有自己的程序计数器，互相独立，所以程序计数器被划分为线程私有内存。<br>当线程执行java方法时，这个计数器存储的的字节码指令的地址，而执行native(如CAS指令或C++一些方法)修饰方法<br>时，计数器为空，而这部分数据是不会造成内存溢出的</p>
+<h3 id="java虚拟机栈"><a href="#java虚拟机栈" class="headerlink" title="java虚拟机栈"></a>java虚拟机栈</h3><p>java虚拟机栈也是线程私有的，生命周期和线程相同，方法执行时被封装在一个帧栈中，里面包括<br>局部变量表，操作数栈，动态链接，方法出口，每一个方法的执行就意味的一个帧栈在虚拟机栈<br>的入栈到出栈过程<br>局部变量表存放基本数据类型和对象的的静态类型<br>操作数栈是方法字节码(code属性)指令执行引擎<br>动态链接是将在运行期间由方法调用符号引用转为直接引用</p>
+<p>*当栈深度大于虚拟机规定的栈深度时，会出现StackOutflowError<br>*如果虚拟机可以动态扩展规定深度，当无法为新建的帧栈分配内存时，会出现OutofMemoryError</p>
+<h3 id="java堆"><a href="#java堆" class="headerlink" title="java堆"></a>java堆</h3><p>用来存储实际对象实例和数组。是垃圾收集器的主要区域，垃圾回收以后再说。<br>堆内存存储是不连续的，只是逻辑上的连续，可以通过jvm参数 -Xmx -Xms控制<br>如果堆内存不能扩展，并且无法为新来的实例分配内存，则会造成OutofMemoryError<br>是线程共享内存</p>
+<h3 id="方法区"><a href="#方法区" class="headerlink" title="方法区"></a>方法区</h3><p>用来储存虚拟机加载类的信息，常量，静态变量<br>在方法区中有一个非常重要的部分就是运行时常量池，它是每一个类或接口的常量池的运行时表示形式，在类和接口被加载到JVM后，对应的运行时常量池就被创建出来。当然并非Class文件常量池中的内容才能进入运行时常量池，在运行期间也可将新的常量放入运行时常量池中，比如String的intern方法。<br>在JVM规范中，没有强制要求方法区必须实现垃圾回收。很多人习惯将方法区称为“永久代”，是因为HotSpot虚拟机以永久代来实现方法区，从而JVM的垃圾收集器可以像管理堆区一样管理这部分区域，从而不需要专门为这部分设计垃圾回收机制。不过自从JDK7之后，Hotspot虚拟机便将运行时常量池从永久代移除了。<br>永久代（PermGen） ，绝大部分 Java 程序员应该都见过 “java.lang.OutOfMemoryError: PermGen space “这个异常。这里的 “PermGen space”其实指的就是方法区。不过方法区和“PermGen space”又有着本质的区别。前者是 JVM 的规范，而后者则是 JVM 规范的一种实现，<br>并且只有 HotSpot 才有 “PermGen space”，而对于其他类型的虚拟机，如 JRockit（Oracle）、J9（IBM） 并没有“PermGen space”。由于方法区主要存储类的相关信息，所以对于动态生成类的情况比较容易出现永久代的内存溢出。最典型的场景就是，在 jsp 页面比较多的情况，容易出现永久代内存溢出。</p>
+<h3 id="直接内存"><a href="#直接内存" class="headerlink" title="直接内存"></a>直接内存</h3><p>出现NIO包中</p>
+<h3 id="元空间"><a href="#元空间" class="headerlink" title="元空间"></a>元空间</h3><p>元空间是方法区的在HotSpot jvm 中的实现，方法区主要用于存储类的信息、常量池、方法数据、方法代码等。方法区逻辑上属于堆的一部分，<br>但是为了与堆进行区分，通常又叫“非堆”。<br>元空间的本质和永久代类似，都是对JVM规范中方法区的实现。不过元空间与永久代之间最大的区别在于：<br>元空间并不在虚拟机中，而是使用本地内存。，理论上取决于32位/64位系统可虚拟的内存大小。可见也不是无限制的，需要配置参数。</p>
+<h3 id="对象创建实质"><a href="#对象创建实质" class="headerlink" title="对象创建实质"></a>对象创建实质</h3><p>虚拟机在为对象分配内存时，首先看是否在常量池中找到这个类的符号引用，并且检查这个类<br>是否已经被加载，解析和初始化，如果没有则首先将该类进行加载，解析和初始化生成Class对象</p>
+<p>在类被初始化后，就可以完全确定对象所需要内存大小<br>假设在堆中的内存是规整的，一边是空闲区域，一边是不空闲区域，中间由一个指针进行分割，将其称为碰撞指针<br>当内存分配时指针向空闲区域挪动一个对象空间大小区域即可。<br>但如果内存是不规整的，空闲区域不是连续的，所以需要去额外维护一个空闲列表，无论开辟空间还是垃圾回收都需要去更新列表<br>内存是否规整是由垃圾收集器决定的，因为在内存规整是进行垃圾回收时容易出现一些内存碎片，需要通过压缩去将空闲内存压缩到一个区域中<br>所以决定内存是否规整是由垃圾收集器是否有压缩整理功能决定的。</p>
+<p>在多线程环境中，有可能会同时在同一个空闲区域中都创建对象，出现两个指针共享一个<br>对象的情况，这是不符合情理的。实际在虚拟机上通过CAS操作保证原子操作，另外一个方式<br>每一个线程都有java堆中预留一小部分专门内存，称为分配缓冲区(TLAB),哪个线程需要分配内存，就在哪个线程的TLAB上分配<br>只有TLAB用完并分配新的TLAB时，才需要同步锁定</p>
+<p>在堆内存划分区域后对对象进行初始化，赋初值</p>
+<p>接下来为对象设置一些信息并封装到对象头中<br>对象头信息:<br>*哈希码<br>*锁记录<br>*对象年龄<br>*线程持有的锁<br>*偏向锁id<br>*偏向时间戳</p>
+<p>这时候在堆中已经划分好区域给这片内存，当还是没有完整创建对象，需要调用字节码中<init>指令执行构造函数，<br>才能返回一个真正可以用的对象</p>
+<h3 id="对象访问定位"><a href="#对象访问定位" class="headerlink" title="对象访问定位"></a>对象访问定位</h3><p>对象调用操作数据主要有实例数据(在java堆中)和类型数据(方法区中)<br>现在有比较常用数据定位方式。<br>1句柄访问<br>设立一个句柄去存储对象的实例数据和类型数据指针，优点是分离实例数据和类型数据，在垃圾回收中，如果指针改变则不需要改变<br>引用指针，而改变句柄就行<br><img src="https://img-blog.csdnimg.cn/20190417214133394.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dvZGVtYWxl,size_16,color_FFFFFF,t_70" width="25%" height="25%" /></p>
+<p>2直接访问<br>将实例数据和类型数据指针混合在一起，优点查询快，因为实例数据只需要查询一遍，但需要考虑垃圾回收指针移动和如何<br>存储指向类型数据的指针。</p>
+<img src="https://img-blog.csdnimg.cn/20190417214138689.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dvZGVtYWxl,size_16,color_FFFFFF,t_70" width="25%" height="25%" />
+
+
+
+<h2 id="内存溢出实战"><a href="#内存溢出实战" class="headerlink" title="内存溢出实战:"></a>内存溢出实战:</h2><h3 id="堆内存溢出"><a href="#堆内存溢出" class="headerlink" title="堆内存溢出"></a>堆内存溢出</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;jvm参数:-Xms20m -Xmx20m -XX:+HeapDumpOnOutOfMemoryError 堆内存为20m，并且不可以动态扩展 HeapDumpOnOutOfMemoryError 得出堆存储快照文件</span><br><span class="line">public class Mytest1 &#123;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        List&lt;Mytest1&gt; list&#x3D;new ArrayList&lt;&gt;();</span><br><span class="line">        while(true)&#123;</span><br><span class="line">            list.add(new Mytest1());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>异常信息:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">java.lang.OutOfMemoryError: Java heap space</span><br><span class="line">Dumping heap to java_pid12084.hprof ...</span><br><span class="line">Exception in thread &quot;main&quot; Heap dump file created [28174804 bytes in 0.181 secs]</span><br><span class="line">java.lang.OutOfMemoryError: Java heap space</span><br><span class="line">	at java.util.Arrays.copyOf(Arrays.java:3210)</span><br><span class="line">	at java.util.Arrays.copyOf(Arrays.java:3181)</span><br><span class="line">	at java.util.ArrayList.grow(ArrayList.java:265)</span><br><span class="line">	at java.util.ArrayList.ensureExplicitCapacity(ArrayList.java:239)</span><br><span class="line">	at java.util.ArrayList.ensureCapacityInternal(ArrayList.java:231)</span><br><span class="line">	at java.util.ArrayList.add(ArrayList.java:462)</span><br><span class="line">	at com.hehe.memory.Mytest1.main(Mytest1.java:12)</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="栈深度异常"><a href="#栈深度异常" class="headerlink" title="栈深度异常"></a>栈深度异常</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">JVM参数:-Xss128k 虚拟机栈内存大小为128K </span><br><span class="line">public class Mytest2 &#123;</span><br><span class="line">    private int length;</span><br><span class="line">    public void test()&#123;</span><br><span class="line">        length++;</span><br><span class="line">        test();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int getLength() &#123;</span><br><span class="line">        return length;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Mytest2 mytest2&#x3D;new Mytest2();</span><br><span class="line">        try&#123;</span><br><span class="line">            mytest2.test();</span><br><span class="line">        &#125;catch (Throwable t)&#123;</span><br><span class="line">            System.out.println(mytest2.getLength());</span><br><span class="line">            t.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>异常信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">993  最大递归深度为993</span><br><span class="line">java.lang.StackOverflowError</span><br><span class="line">	at com.hehe.memory.Mytest2.test(Mytest2.java:6)</span><br><span class="line">	at com.hehe.memory.Mytest2.test(Mytest2.java:7)</span><br><span class="line">	at com.hehe.memory.Mytest2.test(Mytest2.java:7)</span><br><span class="line">	at com.hehe.memory.Mytest2.test(Mytest2.java:7)</span><br><span class="line">	at com.hehe.memory.Mytest2.test(Mytest2.java:7)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;JVM参数:-Xss2m 虚拟机栈内存大小为2m，保证栈深度不会溢出</span><br><span class="line">public class Mytest3 &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        while(true)&#123;</span><br><span class="line">            new Thread(() -&gt; &#123;</span><br><span class="line">                while(true)&#123;</span><br><span class="line"></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;).start();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>创建多个线程，虚拟机栈数量过多，分配内存数量大，直接造成死机<br>java线程映射到操作系统的内存中线程上个，造成系统假死</p>
+<p>方法区内存溢出<br>1.8之前版本方法区的运行时常量池是永久代，1.8以后是元空间<br>通过动态代理创建动态代理类放入方法区中测试方法区内存溢出</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;JVM参数:-XX:MetaspaceSize&#x3D;8m -XX:MaxMetaspaceSize&#x3D;50m</span><br><span class="line">public class Mytest4 &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line"></span><br><span class="line">        while (true)&#123;</span><br><span class="line">            Enhancer enhancer&#x3D;new Enhancer();</span><br><span class="line">            enhancer.setSuperclass(Mytest4.class);</span><br><span class="line">            enhancer.setUseCache(false);</span><br><span class="line">            enhancer.setCallback(new MethodInterceptor() &#123;</span><br><span class="line">                @Override</span><br><span class="line">                public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable &#123;</span><br><span class="line">                    return methodProxy.invoke(o,objects);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">            enhancer.create();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>1.8错误信息:元空间内存溢出</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Exception in thread &quot;main&quot; java.lang.OutOfMemoryError: Metaspace</span><br><span class="line">	at java.lang.Class.forName0(Native Method)</span><br><span class="line">	at java.lang.Class.forName(Class.java:348)</span><br><span class="line">	at net.sf.cglib.core.ReflectUtils.defineClass(ReflectUtils.java:386)</span><br><span class="line">	at net.sf.cglib.core.AbstractClassGenerator.create(AbstractClassGenerator.java:219)</span><br><span class="line">	at net.sf.cglib.proxy.Enhancer.createHelper(Enhancer.java:377)</span><br><span class="line">	at net.sf.cglib.proxy.Enhancer.create(Enhancer.java:285)</span><br><span class="line">	at com.hehe.memory.Mytest4.main(Mytest4.java:22)</span><br></pre></td></tr></table></figure>
+<p>1.7错误信息，永久代方法溢出</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">“java.lang.OutOfMemoryError: PermGen space</span><br></pre></td></tr></table></figure>
+
+<h3 id="java1-8内存划分"><a href="#java1-8内存划分" class="headerlink" title="java1.8内存划分"></a>java1.8内存划分</h3><img src="https://img-blog.csdn.net/20180812235058303?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2JydWNlMTI4/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" width="25%" height="25%" />
+
+
+
+<p>1.8同1.7比，最大的差别就是：元数据区取代了永久代。<br>元空间的本质和永久代类似，都是对JVM规范中方法区的实现。不过元空间与永久代之间最大的区别在于：<br>元数据空间并不在虚拟机内存中，而是使用本地内存。</p>
+<h3 id="String的引用"><a href="#String的引用" class="headerlink" title="String的引用"></a>String的引用</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">public class Mytest5 &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        String a&#x3D;&quot;a&quot;;&#x2F;&#x2F;分配在堆内存中，但会存储在String方法区一个对象池中（本质是一个字符串的数组)，并由a去指向，那字符串堆内存会被GC？</span><br><span class="line">        String a1&#x3D;new String(&quot;a&quot;); &#x2F;&#x2F;分配在堆内存中</span><br><span class="line">        System.out.println(a1&#x3D;&#x3D;a);</span><br><span class="line">        new Thread(() -&gt; &#123;</span><br><span class="line">            String b&#x3D;&quot;a&quot;;</span><br><span class="line">            System.out.println(a&#x3D;&#x3D;b);&#x2F;&#x2F;可见是线程共享的,字符串被调用时将会使用对象池中的字符串，不会重新开辟堆内存</span><br><span class="line">        &#125;).start();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料:"></a>参考资料:</h2><p><a href="https://www.bilibili.com/video/BV187411B7iv?p=67" target="_blank" rel="noopener">参考视频b站张龙</a><br>书籍：&lt;&lt;深入理解java虚拟机&gt;&gt; 周志明<br><a href="https://blog.csdn.net/ctwy291314/article/details/84985199" target="_blank" rel="noopener">博客</a><br><a href="https://blog.csdn.net/wodemale/article/details/89365631?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.edu_weight&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.edu_weight" target="_blank" rel="noopener">博客二</a></p>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
+        </div>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2020/09/10/run-memory/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/09/10/gc/" class="archive-article-date">
-  	<time datetime="2020-09-10T02:56:30.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-09-10</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/2020/09/10/gc/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">gc</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
+        
+        
+    </div>
+</aside>
+
+
+
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/09/10/gc/">gc</a>
-    </h1>
+  
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/07/08/jvm-bytecode/" class="archive-article-date">
-  	<time datetime="2020-07-08T07:00:34.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-07-08</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/07/08/jvm-bytecode/">字节码文件</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">jvm</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/07/07/hello-world/" class="archive-article-date">
-  	<time datetime="2020-07-07T09:57:41.332Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-07-07</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/07/07/hello-world/">Hello World</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
   
-  
-    </div></section>
-  
-
-    
 
 
           </div>
@@ -307,8 +392,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
