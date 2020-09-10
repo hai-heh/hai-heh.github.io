@@ -6,27 +6,25 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>字节码文件 | Hexo</title>
+  <title>ReentrantLock源码分析 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="总体介绍字节码总体结构:1java中可以用javap -verbose去分析一个.class文件，将会分析字节码文件的魔数，版本号，常量池，类信息，类的构造方法，类的方法和类变量，成员变量2所有.class文件前4个字节都是魔数,数值为0xCAFEBABE作为字节码文件开头识别标记，一共4个字节3魔数后面4个字节为版本信息，前两个是主版本信息，后两个是次版本信息4后面紧跟常量池数量，占据两个字">
+  <meta name="description" content="ReentrantLock的数据结构同步状态量state1private volatile int state; 0表示没有加锁，1表示已经加锁，大于1表示可重入 AQS队列  AQS中同步等待队列的实现是一个带头尾指针(这里用指针表示引用是为了后面讲解源码时可以更直观形象,况且引用本身是一种受限的指针)且不带哨兵结点(后文中的头结点表示队列首元素结点,不是指哨兵结点)的双向链表。头结点表示获取到">
 <meta property="og:type" content="article">
-<meta property="og:title" content="字节码文件">
-<meta property="og:url" content="http://yoursite.com/2020/07/08/jvm-bytecode/index.html">
+<meta property="og:title" content="ReentrantLock源码分析">
+<meta property="og:url" content="http://yoursite.com/2020/09/10/ReentrantLock/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="总体介绍字节码总体结构:1java中可以用javap -verbose去分析一个.class文件，将会分析字节码文件的魔数，版本号，常量池，类信息，类的构造方法，类的方法和类变量，成员变量2所有.class文件前4个字节都是魔数,数值为0xCAFEBABE作为字节码文件开头识别标记，一共4个字节3魔数后面4个字节为版本信息，前两个是主版本信息，后两个是次版本信息4后面紧跟常量池数量，占据两个字">
+<meta property="og:description" content="ReentrantLock的数据结构同步状态量state1private volatile int state; 0表示没有加锁，1表示已经加锁，大于1表示可重入 AQS队列  AQS中同步等待队列的实现是一个带头尾指针(这里用指针表示引用是为了后面讲解源码时可以更直观形象,况且引用本身是一种受限的指针)且不带哨兵结点(后文中的头结点表示队列首元素结点,不是指哨兵结点)的双向链表。头结点表示获取到">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://i0.hdslb.com/bfs/article/2ed0c7089921e5e7edc49a0c4639f33ae3850902.jpg@1170w_1800h.webp">
-<meta property="og:image" content="https://img-blog.csdn.net/20180804134458717?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d6cTY1Nzg3MDI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70">
-<meta property="og:image" content="https://img-blog.csdn.net/20180413104433349?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM5Mzc1MjEx/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70">
-<meta property="og:image" content="https://img-blog.csdn.net/20180413104450619?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM5Mzc1MjEx/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70">
-<meta property="og:image" content="https://hehehehehe.oss-cn-shenzhen.aliyuncs.com/jvm%20bytecode/class%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%96%87%E4%BB%B6.PNG">
-<meta property="og:image" content="https://img-blog.csdn.net/20180804141459924?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d6cTY1Nzg3MDI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70">
-<meta property="article:published_time" content="2020-07-08T07:00:34.000Z">
-<meta property="article:modified_time" content="2020-09-03T08:40:05.171Z">
+<meta property="og:image" content="https://images2018.cnblogs.com/blog/1422237/201808/1422237-20180805183911414-329333235.png">
+<meta property="og:image" content="https://images2018.cnblogs.com/blog/1422237/201808/1422237-20180805184242438-1630878927.png">
+<meta property="og:image" content="https://images2018.cnblogs.com/blog/1422237/201808/1422237-20180805184331148-1572746602.png">
+<meta property="og:image" content="https://images2018.cnblogs.com/blog/1422237/201808/1422237-20180805184348967-1221850147.png">
+<meta property="article:published_time" content="2020-09-10T06:50:05.000Z">
+<meta property="article:modified_time" content="2020-09-10T12:09:09.252Z">
 <meta property="article:author" content="John Doe">
-<meta property="article:tag" content="jvm">
+<meta property="article:tag" content="JDK源码">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://i0.hdslb.com/bfs/article/2ed0c7089921e5e7edc49a0c4639f33ae3850902.jpg@1170w_1800h.webp">
+<meta name="twitter:image" content="https://images2018.cnblogs.com/blog/1422237/201808/1422237-20180805183911414-329333235.png">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -162,424 +160,65 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-jvm-bytecode" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-ReentrantLock" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      字节码文件
+      ReentrantLock源码分析
     </h1>
   
 
         
-        <a href="/2020/07/08/jvm-bytecode/" class="archive-article-date">
-  	<time datetime="2020-07-08T07:00:34.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-07-08</time>
+        <a href="/2020/09/10/ReentrantLock/" class="archive-article-date">
+  	<time datetime="2020-09-10T06:50:05.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-09-10</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <img src="https://i0.hdslb.com/bfs/article/2ed0c7089921e5e7edc49a0c4639f33ae3850902.jpg@1170w_1800h.webp" width="25%" height="25%" />
+        <h2 id="ReentrantLock的数据结构"><a href="#ReentrantLock的数据结构" class="headerlink" title="ReentrantLock的数据结构"></a>ReentrantLock的数据结构</h2><h3 id="同步状态量state"><a href="#同步状态量state" class="headerlink" title="同步状态量state"></a>同步状态量state</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">private volatile int state;</span><br></pre></td></tr></table></figure>
+<p>0表示没有加锁，1表示已经加锁，大于1表示可重入</p>
+<h3 id="AQS队列"><a href="#AQS队列" class="headerlink" title="AQS队列"></a>AQS队列</h3><img src="https://images2018.cnblogs.com/blog/1422237/201808/1422237-20180805183911414-329333235.png" width="25%" height="25%" />
 
-<h2 id="总体介绍"><a href="#总体介绍" class="headerlink" title="总体介绍"></a>总体介绍</h2><p>字节码总体结构:<br><img src="https://img-blog.csdn.net/20180804134458717?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d6cTY1Nzg3MDI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" width="25%" height="25%" /><br>1java中可以用javap -verbose去分析一个.class文件，将会分析字节码文件的魔数，版本号，常量池，类信息，类的构造方法，类的方法和类变量，成员变量<br>2所有.class文件前4个字节都是魔数,数值为0xCAFEBABE作为字节码文件开头识别标记，一共4个字节<br>3魔数后面4个字节为版本信息，前两个是主版本信息，后两个是次版本信息<br>4后面紧跟常量池数量，占据两个字节<br>5后面常量池是常量池数组，一个数据由标记位(u1)和索引(u1和u2都有)组成的，一共有14种常量池数据，遇到的元素不同其结构和长度也是不同的，需要注意的是常量池的长度有1开始的，0暂时不使用<br>5.1 每一个变量都有其描述符，其描述符一般去记录他的字段类型，但为了压缩字节码文件进行简写，一般用大写首字母作为字段如B=byte，特殊J=long<br>    而对象用L表示，如Ljava/lang/String<br>5.2 对于数组描述符也是简写，如[I 表示int[],[[Ljava/lang/String表示String[][]<br>5.3  对于方法描述符而言先按照其先参数列表和后返回值进行描述，如 String getname(int a,int b) 描述符为 (I,I) Ljava/lang/String</p>
-<h2 id="二进制字节码文件解析"><a href="#二进制字节码文件解析" class="headerlink" title="二进制字节码文件解析:"></a>二进制字节码文件解析:</h2><p>.class文件：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">public class Mytest1 &#123;</span><br><span class="line">    private String a;</span><br><span class="line">    public Mytest1() &#123;</span><br><span class="line">    &#125;</span><br><span class="line">    public String getA() &#123;</span><br><span class="line">        return this.a;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public Mytest1 setA(String a) &#123;</span><br><span class="line">        this.a &#x3D; a;</span><br><span class="line">        return this;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>AQS中同步等待队列的实现是一个带头尾指针(这里用指针表示引用是为了后面讲解源码时可以更直观形象,<br>况且引用本身是一种受限的指针)且不带哨兵结点(后文中的头结点表示队列首元素结点,不是指哨兵结点)的双向链表。<br>头结点表示获取到锁的节点，后面节点将会自旋或被阻塞</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">volatile Node prev; &#x2F;&#x2F;指向前一个结点的指针</span><br><span class="line">volatile Node next; &#x2F;&#x2F;指向后一个结点的指针</span><br><span class="line">volatile Thread thread; &#x2F;&#x2F;当前结点代表的线程</span><br><span class="line">volatile int waitStatus; &#x2F;&#x2F;当前节点的状态</span><br></pre></td></tr></table></figure>
+<p>waitStatus=0为初始状态，-1为single状态，表示要唤醒后续节点，为1(CANCELLED)时表示线程被中断</p>
+<h2 id="非公平锁源码解析"><a href="#非公平锁源码解析" class="headerlink" title="非公平锁源码解析"></a>非公平锁源码解析</h2><h3 id="应用层调用"><a href="#应用层调用" class="headerlink" title="应用层调用"></a>应用层调用</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">public class test1 &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        ReentrantLock lock &#x3D;new ReentrantLock();</span><br><span class="line">        try &#123;</span><br><span class="line">            lock.lock();</span><br><span class="line">        &#125;finally &#123;</span><br><span class="line">            lock.unlock();</span><br><span class="line">        &#125;</span><br><span class="line">      </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="构造函数"><a href="#构造函数" class="headerlink" title="构造函数"></a>构造函数</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public ReentrantLock() &#123;</span><br><span class="line">     sync &#x3D; new NonfairSync();</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="lock方法"><a href="#lock方法" class="headerlink" title="lock方法"></a>lock方法</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">static final class NonfairSync extends Sync &#123;</span><br><span class="line">        private static final long serialVersionUID &#x3D; 7316153563782823691L;</span><br><span class="line"></span><br><span class="line">        &#x2F;**</span><br><span class="line">         * Performs lock.  Try immediate barge, backing up to normal</span><br><span class="line">         * acquire on failure.</span><br><span class="line">         *&#x2F;</span><br><span class="line">        final void lock() &#123; &#x2F;&#x2F;真正实现非公平lock的逻辑</span><br><span class="line">            if (compareAndSetState(0, 1))  &#x2F;&#x2F;开始尝试加锁，通过CAS操作将state属性0变成1</span><br><span class="line">                setExclusiveOwnerThread(Thread.currentThread()); &#x2F;&#x2F;加锁成功就设独占线程为当期线程，ReentrantLock为可重入独占锁</span><br><span class="line">            else   &#x2F;&#x2F;加锁失败</span><br><span class="line">                acquire(1); </span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        protected final boolean tryAcquire(int acquires) &#123;</span><br><span class="line">            return nonfairTryAcquire(acquires);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="第一次加锁失败后的逻辑"><a href="#第一次加锁失败后的逻辑" class="headerlink" title="第一次加锁失败后的逻辑"></a>第一次加锁失败后的逻辑</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;逻辑是这样的，tryAcquire(arg)为再次尝试加锁，如果失败即为false，则执行acquireQueued(addWaiter(Node.EXCLUSIVE), arg))方法，</span><br><span class="line">&#x2F;&#x2F;addWaiter(Node.EXCLUSIVE), arg)为将节点加入到AQS队列中，acquireQueued则执行节点放入到队列后的逻辑</span><br><span class="line">  public final void acquire(int arg) &#123;</span><br><span class="line">        if (!tryAcquire(arg) &amp;&amp;</span><br><span class="line">            acquireQueued(addWaiter(Node.EXCLUSIVE), arg))</span><br><span class="line">            selfInterrupt();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="tryAcquire-arg-方法，调用非公平方法"><a href="#tryAcquire-arg-方法，调用非公平方法" class="headerlink" title="tryAcquire(arg)方法，调用非公平方法"></a>tryAcquire(arg)方法，调用非公平方法</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">final boolean nonfairTryAcquire(int acquires) &#123;</span><br><span class="line">           final Thread current &#x3D; Thread.currentThread(); &#x2F;&#x2F;获取当前独占线程</span><br><span class="line">           int c &#x3D; getState(); &#x2F;&#x2F;获取状态量</span><br><span class="line">           if (c &#x3D;&#x3D; 0) &#123; &#x2F;&#x2F;表示为空闲状态</span><br><span class="line">               if (compareAndSetState(0, acquires)) &#123; &#x2F;&#x2F;通过CAS操作将state属性0变成1</span><br><span class="line">                   setExclusiveOwnerThread(current);</span><br><span class="line">                   return true; &#x2F;&#x2F;获取锁成功，执行业务逻辑</span><br><span class="line">               &#125;</span><br><span class="line">           &#125;</span><br><span class="line">           else if (current &#x3D;&#x3D; getExclusiveOwnerThread()) &#123; &#x2F;&#x2F;不是空闲，判断是否可重入</span><br><span class="line">               int nextc &#x3D; c + acquires; &#x2F;&#x2F;state值自增</span><br><span class="line">               if (nextc &lt; 0) &#x2F;&#x2F; overflow</span><br><span class="line">                   throw new Error(&quot;Maximum lock count exceeded&quot;);</span><br><span class="line">               setState(nextc);</span><br><span class="line">               return true; &#x2F;&#x2F;获取锁成功，执行业务逻辑</span><br><span class="line">           &#125;</span><br><span class="line">           return false; &#x2F;&#x2F;表示获取锁失败，则会执行acquireQueued(addWaiter(Node.EXCLUSIVE), arg))</span><br><span class="line">       &#125;</span><br></pre></td></tr></table></figure>
+<p>总结一下<br>1.如果state=0,则尝试通过CAS获取锁，获取成功则执行当前线程业务逻辑，获取失败插入到AQS队列中<br>2.如果state&gt;0,则判断一下是否为可重入，如果是则state++,执行当前线程业务逻辑，不是则插入到AQS队列中</p>
+<h3 id="addWaiter-Node-EXCLUSIVE-arg"><a href="#addWaiter-Node-EXCLUSIVE-arg" class="headerlink" title="addWaiter(Node.EXCLUSIVE), arg)"></a>addWaiter(Node.EXCLUSIVE), arg)</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">private Node addWaiter(Node mode) &#123;</span><br><span class="line">       Node node &#x3D; new Node(Thread.currentThread(), mode); &#x2F;&#x2F;将当期线程封装到节点中</span><br><span class="line">       &#x2F;&#x2F; Try the fast path of enq; backup to full enq on failure</span><br><span class="line">       Node pred &#x3D; tail;</span><br><span class="line">	&#x2F;&#x2F;将节点插入到队列尾部，注意这里要求队列不能为空</span><br><span class="line">       if (pred !&#x3D; null) &#123;</span><br><span class="line">           node.prev &#x3D; pred;</span><br><span class="line">           if (compareAndSetTail(pred, node)) &#123; &#x2F;&#x2F;插入成功则退出</span><br><span class="line">               pred.next &#x3D; node;</span><br><span class="line">               return node;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">       enq(node); &#x2F;&#x2F;插入失败，则自旋插入</span><br><span class="line">       return node;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>将节点插入到队列尾部的实现<br>1.将node节点的前置指针指向tail节点(pred)尾部<br>2.CAS修改tail指针，让tail指向node；<br>3.pred的后置指针指向node节点</p>
+<h3 id="enq-node"><a href="#enq-node" class="headerlink" title="enq(node)"></a>enq(node)</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">private Node enq(final Node node) &#123;</span><br><span class="line">    for (;;) &#123;</span><br><span class="line">        Node t &#x3D; tail; </span><br><span class="line">        if (t &#x3D;&#x3D; null) &#123; &#x2F;&#x2F; Must initialize  &#x2F;&#x2F;如果队列为空</span><br><span class="line">            if (compareAndSetHead(new Node())) &#x2F;&#x2F;插入一个值为null节点，作为头节点</span><br><span class="line">                tail &#x3D; head; &#x2F;&#x2F;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            node.prev &#x3D; t;  &#x2F;&#x2F;队列不为空，插入到队列尾部</span><br><span class="line">            if (compareAndSetTail(t, node)) &#123;</span><br><span class="line">                t.next &#x3D; node;</span><br><span class="line">                return t;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>队列为空，需要插入头节点，然后才插入当前线程节点，目的是为了保证头节点是获取锁的，第二个节点如果被阻塞将要被头节点唤醒去争夺锁</p>
+<h3 id="acquireQueued-final-Node-node-int-arg"><a href="#acquireQueued-final-Node-node-int-arg" class="headerlink" title="acquireQueued(final Node node, int arg)"></a>acquireQueued(final Node node, int arg)</h3><p>节点插入到AQS队列后执行逻辑</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">final boolean acquireQueued(final Node node, int arg) &#123;</span><br><span class="line">    boolean failed &#x3D; true;</span><br><span class="line">    try &#123;</span><br><span class="line">        boolean interrupted &#x3D; false;</span><br><span class="line">        for (;;) &#123;</span><br><span class="line">            final Node p &#x3D; node.predecessor();  &#x2F;&#x2F;获取前置节点</span><br><span class="line">            if (p &#x3D;&#x3D; head &amp;&amp; tryAcquire(arg)) &#123;  &#x2F;&#x2F;如果前置节点为头节点并且获取锁成功</span><br><span class="line">                setHead(node);   &#x2F;&#x2F;将当前节点设为头节点表示获取锁</span><br><span class="line">                p.next &#x3D; null; &#x2F;&#x2F; help GC</span><br><span class="line">                failed &#x3D; false;</span><br><span class="line">                return interrupted;  &#x2F;&#x2F;</span><br><span class="line">            &#125;</span><br><span class="line">            if (shouldParkAfterFailedAcquire(p, node) &amp;&amp;  &#x2F;&#x2F;没有满足上面条件，则考虑是否阻塞</span><br><span class="line">                parkAndCheckInterrupt())  &#x2F;&#x2F;阻塞当前线程</span><br><span class="line">                interrupted &#x3D; true;   &#x2F;&#x2F;如果线程中断则返回true(在获取锁状态后将会被中断)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; finally &#123;</span><br><span class="line">        if (failed)</span><br><span class="line">            cancelAcquire(node);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 
-<p>通过javap -verbose解析class文件</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line">Classfile &#x2F;C:&#x2F;Users&#x2F;Lenovo&#x2F;IdeaProjects&#x2F;JVM&#x2F;out&#x2F;production&#x2F;JVM&#x2F;com&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest1.class</span><br><span class="line">  Last modified 2020年7月8日; size 550 bytes</span><br><span class="line">  MD5 checksum 8b09d24fd5c341381417eb0d13ebea9a</span><br><span class="line">  Compiled from &quot;Mytest1.java&quot;</span><br><span class="line">public class com.hehe.Bytecode.Mytest1</span><br><span class="line">  minor version: 0</span><br><span class="line">  major version: 52</span><br><span class="line">  flags: (0x0021) ACC_PUBLIC, ACC_SUPER</span><br><span class="line">  this_class: #3                          &#x2F;&#x2F; com&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest1</span><br><span class="line">  super_class: #4                         &#x2F;&#x2F; java&#x2F;lang&#x2F;Object</span><br><span class="line">  interfaces: 0, fields: 1, methods: 3, attributes: 1</span><br><span class="line">Constant pool:</span><br><span class="line">   #1 &#x3D; Methodref          #4.#20         &#x2F;&#x2F; java&#x2F;lang&#x2F;Object.&quot;&lt;init&gt;&quot;:()V</span><br><span class="line">   #2 &#x3D; Fieldref           #3.#21         &#x2F;&#x2F; com&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest1.a:Ljava&#x2F;lang&#x2F;String;</span><br><span class="line">   #3 &#x3D; Class              #22            &#x2F;&#x2F; com&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest1</span><br><span class="line">   #4 &#x3D; Class              #23            &#x2F;&#x2F; java&#x2F;lang&#x2F;Object</span><br><span class="line">   #5 &#x3D; Utf8               a</span><br><span class="line">   #6 &#x3D; Utf8               Ljava&#x2F;lang&#x2F;String;</span><br><span class="line">   #7 &#x3D; Utf8               &lt;init&gt;</span><br><span class="line">   #8 &#x3D; Utf8               ()V</span><br><span class="line">   #9 &#x3D; Utf8               Code</span><br><span class="line">  #10 &#x3D; Utf8               LineNumberTable</span><br><span class="line">  #11 &#x3D; Utf8               LocalVariableTable</span><br><span class="line">  #12 &#x3D; Utf8               this</span><br><span class="line">  #13 &#x3D; Utf8               Lcom&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest1;</span><br><span class="line">  #14 &#x3D; Utf8               getA</span><br><span class="line">  #15 &#x3D; Utf8               ()Ljava&#x2F;lang&#x2F;String;</span><br><span class="line">  #16 &#x3D; Utf8               setA</span><br><span class="line">  #17 &#x3D; Utf8               (Ljava&#x2F;lang&#x2F;String;)Lcom&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest1;</span><br><span class="line">  #18 &#x3D; Utf8               SourceFile</span><br><span class="line">  #19 &#x3D; Utf8               Mytest1.java</span><br><span class="line">  #20 &#x3D; NameAndType        #7:#8          &#x2F;&#x2F; &quot;&lt;init&gt;&quot;:()V</span><br><span class="line">  #21 &#x3D; NameAndType        #5:#6          &#x2F;&#x2F; a:Ljava&#x2F;lang&#x2F;String;</span><br><span class="line">  #22 &#x3D; Utf8               com&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest1</span><br><span class="line">  #23 &#x3D; Utf8               java&#x2F;lang&#x2F;Object</span><br><span class="line">&#123;</span><br><span class="line">  public com.hehe.Bytecode.Mytest1();</span><br><span class="line">    descriptor: ()V</span><br><span class="line">    flags: (0x0001) ACC_PUBLIC</span><br><span class="line">    Code:</span><br><span class="line">      stack&#x3D;1, locals&#x3D;1, args_size&#x3D;1</span><br><span class="line">         0: aload_0</span><br><span class="line">         1: invokespecial #1                  &#x2F;&#x2F; Method java&#x2F;lang&#x2F;Object.&quot;&lt;init&gt;&quot;:()V</span><br><span class="line">         4: return</span><br><span class="line">      LineNumberTable:</span><br><span class="line">        line 3: 0</span><br><span class="line">      LocalVariableTable:</span><br><span class="line">        Start  Length  Slot  Name   Signature</span><br><span class="line">            0       5     0  this   Lcom&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest1;</span><br><span class="line"></span><br><span class="line">  public java.lang.String getA();</span><br><span class="line">    descriptor: ()Ljava&#x2F;lang&#x2F;String;</span><br><span class="line">    flags: (0x0001) ACC_PUBLIC</span><br><span class="line">    Code:</span><br><span class="line">      stack&#x3D;1, locals&#x3D;1, args_size&#x3D;1</span><br><span class="line">         0: aload_0</span><br><span class="line">         1: getfield      #2                  &#x2F;&#x2F; Field a:Ljava&#x2F;lang&#x2F;String;</span><br><span class="line">         4: areturn</span><br><span class="line">      LineNumberTable:</span><br><span class="line">        line 8: 0</span><br><span class="line">      LocalVariableTable:</span><br><span class="line">        Start  Length  Slot  Name   Signature</span><br><span class="line">            0       5     0  this   Lcom&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest1;</span><br><span class="line"></span><br><span class="line">  public com.hehe.Bytecode.Mytest1 setA(java.lang.String);</span><br><span class="line">    descriptor: (Ljava&#x2F;lang&#x2F;String;)Lcom&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest1;</span><br><span class="line">    flags: (0x0001) ACC_PUBLIC</span><br><span class="line">    Code:</span><br><span class="line">      stack&#x3D;2, locals&#x3D;2, args_size&#x3D;2</span><br><span class="line">         0: aload_0</span><br><span class="line">         1: aload_1</span><br><span class="line">         2: putfield      #2                  &#x2F;&#x2F; Field a:Ljava&#x2F;lang&#x2F;String;</span><br><span class="line">         5: aload_0</span><br><span class="line">         6: areturn</span><br><span class="line">      LineNumberTable:</span><br><span class="line">        line 12: 0</span><br><span class="line">        line 13: 5</span><br><span class="line">      LocalVariableTable:</span><br><span class="line">        Start  Length  Slot  Name   Signature</span><br><span class="line">            0       7     0  this   Lcom&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest1;</span><br><span class="line">            0       7     1     a   Ljava&#x2F;lang&#x2F;String;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="private-static-boolean-shouldParkAfterFailedAcquire-Node-pred-Node-node"><a href="#private-static-boolean-shouldParkAfterFailedAcquire-Node-pred-Node-node" class="headerlink" title="private static boolean shouldParkAfterFailedAcquire(Node pred, Node node)"></a>private static boolean shouldParkAfterFailedAcquire(Node pred, Node node)</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">private static boolean shouldParkAfterFailedAcquire(Node pred, Node node) &#123;</span><br><span class="line">       int ws &#x3D; pred.waitStatus;</span><br><span class="line">	&#x2F;&#x2F;一开始当前节点waitStatus&#x3D;0，所以一开始不会去阻塞</span><br><span class="line">       if (ws &#x3D;&#x3D; Node.SIGNAL) </span><br><span class="line">           &#x2F;*</span><br><span class="line">            * This node has already set status asking a release</span><br><span class="line">            * to signal it, so it can safely park.</span><br><span class="line">            *&#x2F;</span><br><span class="line">           return true; &#x2F;&#x2F;应该阻塞</span><br><span class="line">       if (ws &gt; 0) &#123;  &#x2F;&#x2F;当前节点前置节点已经被中断了，去找离当前节点最近的前置节点而且状态不是中断状态节点(&gt;0)</span><br><span class="line">           &#x2F;*</span><br><span class="line">            * Predecessor was cancelled. Skip over predecessors and</span><br><span class="line">            * indicate retry.</span><br><span class="line">            *&#x2F;</span><br><span class="line">           do &#123;</span><br><span class="line">               node.prev &#x3D; pred &#x3D; pred.prev;</span><br><span class="line">           &#125; while (pred.waitStatus &gt; 0);</span><br><span class="line">           pred.next &#x3D; node;</span><br><span class="line">       &#125; else &#123; &#x2F;&#x2F;ws&#x3D;0</span><br><span class="line">           &#x2F;*</span><br><span class="line">            * waitStatus must be 0 or PROPAGATE.  Indicate that we</span><br><span class="line">            * need a signal, but don&#39;t park yet.  Caller will need to</span><br><span class="line">            * retry to make sure it cannot acquire before parking.</span><br><span class="line">            *&#x2F;</span><br><span class="line">           compareAndSetWaitStatus(pred, ws, Node.SIGNAL); &#x2F;&#x2F;状态设为SIGNAL状态，为下一次判断阻塞做准备</span><br><span class="line">       &#125;</span><br><span class="line">       return false;  &#x2F;&#x2F;不阻塞</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
 
+<h3 id="parkAndCheckInterrupt"><a href="#parkAndCheckInterrupt" class="headerlink" title="parkAndCheckInterrupt()"></a>parkAndCheckInterrupt()</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">private final boolean parkAndCheckInterrupt() &#123;</span><br><span class="line">        LockSupport.park(this); &#x2F;&#x2F;阻塞当前线程</span><br><span class="line">        return Thread.interrupted(); &#x2F;&#x2F;检查是否中断</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>处于AQS队列节点的逻辑图<br><img src="https://images2018.cnblogs.com/blog/1422237/201808/1422237-20180805184242438-1630878927.png" width="50%" height="50%" /></p>
+<p>整个非公平锁的逻辑图<br><img src="https://images2018.cnblogs.com/blog/1422237/201808/1422237-20180805184331148-1572746602.png" width="50%" height="50%" /></p>
+<h2 id="非公共锁解锁"><a href="#非公共锁解锁" class="headerlink" title="非公共锁解锁"></a>非公共锁解锁</h2><h3 id="release-int-arg"><a href="#release-int-arg" class="headerlink" title="release(int arg)"></a>release(int arg)</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public final boolean release(int arg) &#123;</span><br><span class="line">    if (tryRelease(arg)) &#123;  &#x2F;&#x2F;尝试解锁，state&#x3D;0才真正释放锁，唤醒下一个节点</span><br><span class="line">        Node h &#x3D; head;</span><br><span class="line">        if (h !&#x3D; null &amp;&amp; h.waitStatus !&#x3D; 0) &#x2F;&#x2F;唤醒下一个节点</span><br><span class="line">            unparkSuccessor(h);</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line">    return false;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="tryRelease-int-releases"><a href="#tryRelease-int-releases" class="headerlink" title="tryRelease(int releases)"></a>tryRelease(int releases)</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">protected final boolean tryRelease(int releases) &#123;</span><br><span class="line">       int c &#x3D; getState() - releases; &#x2F;&#x2F;state--</span><br><span class="line">       if (Thread.currentThread() !&#x3D; getExclusiveOwnerThread())</span><br><span class="line">           throw new IllegalMonitorStateException();</span><br><span class="line">       boolean free &#x3D; false; </span><br><span class="line">       if (c &#x3D;&#x3D; 0) &#123; &#x2F;&#x2F;如果为0返回true</span><br><span class="line">           free &#x3D; true;</span><br><span class="line">           setExclusiveOwnerThread(null); &#x2F;&#x2F;设置独占线程为空</span><br><span class="line">       &#125;</span><br><span class="line">       setState(c); &#x2F;&#x2F;当前线程还有锁没有被释放</span><br><span class="line">       return free;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
 
+<h3 id="unparkSuccessor-Node-node"><a href="#unparkSuccessor-Node-node" class="headerlink" title="unparkSuccessor(Node node)"></a>unparkSuccessor(Node node)</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">private void unparkSuccessor(Node node) &#123;</span><br><span class="line">       &#x2F;*</span><br><span class="line">        * If status is negative (i.e., possibly needing signal) try</span><br><span class="line">        * to clear in anticipation of signalling.  It is OK if this</span><br><span class="line">        * fails or if status is changed by waiting thread.</span><br><span class="line">        *&#x2F;</span><br><span class="line">       int ws &#x3D; node.waitStatus; </span><br><span class="line">       if (ws &lt; 0)  &#x2F;&#x2F;将当前节点状态设为0</span><br><span class="line">           compareAndSetWaitStatus(node, ws, 0);</span><br><span class="line"></span><br><span class="line">       &#x2F;*</span><br><span class="line">        * Thread to unpark is held in successor, which is normally</span><br><span class="line">        * just the next node.  But if cancelled or apparently null,</span><br><span class="line">        * traverse backwards from tail to find the actual</span><br><span class="line">        * non-cancelled successor.</span><br><span class="line">        *&#x2F;</span><br><span class="line">       Node s &#x3D; node.next; &#x2F;&#x2F;唤醒下一个节点</span><br><span class="line">       if (s &#x3D;&#x3D; null || s.waitStatus &gt; 0) &#123;  &#x2F;&#x2F;如果下一个节点被中断了，则从尾结点从后往前找，离头节点最近的的非中断节点</span><br><span class="line">           s &#x3D; null;</span><br><span class="line">           for (Node t &#x3D; tail; t !&#x3D; null &amp;&amp; t !&#x3D; node; t &#x3D; t.prev)</span><br><span class="line">               if (t.waitStatus &lt;&#x3D; 0)</span><br><span class="line">                   s &#x3D; t;</span><br><span class="line">       &#125;</span><br><span class="line">       if (s !&#x3D; null)</span><br><span class="line">           LockSupport.unpark(s.thread); &#x2F;&#x2F;唤醒该线程</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
 
-<p> 常量池结构表:<br> <img src="https://img-blog.csdn.net/20180413104433349?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM5Mzc1MjEx/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" width="75%" height="75%" /><br> <img src="https://img-blog.csdn.net/20180413104450619?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM5Mzc1MjEx/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" width="75%" height="75%" /></p>
-<p> 二进制文件:<br> <img src="https://hehehehehe.oss-cn-shenzhen.aliyuncs.com/jvm%20bytecode/class%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%96%87%E4%BB%B6.PNG" width="50%" height="50%" /></p>
-<p> 分析二进制文件:</p>
-<table>
-<thead>
-<tr>
-<th align="right">二进制字段</th>
-<th align="right">javap编译文件常量池对应行数或字符串的值</th>
-<th align="right">备注</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="right">CA FE BA BE</td>
-<td align="right">~</td>
-<td align="right">魔数</td>
-</tr>
-<tr>
-<td align="right">00 00 00 34</td>
-<td align="right">00 52</td>
-<td align="right">版本号</td>
-</tr>
-<tr>
-<td align="right">00 18</td>
-<td align="right">24个常量项</td>
-<td align="right">常量项数量</td>
-</tr>
-<tr>
-<td align="right">第一个常量</td>
-<td align="right"></td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">0A</td>
-<td align="right">1</td>
-<td align="right">即idea中Methodref常量项</td>
-</tr>
-<tr>
-<td align="right">00 04</td>
-<td align="right">4</td>
-<td align="right">第一个常量索引</td>
-</tr>
-<tr>
-<td align="right">00 14</td>
-<td align="right">20</td>
-<td align="right">第二个常量索引</td>
-</tr>
-<tr>
-<td align="right">第二个常量</td>
-<td align="right"></td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">09</td>
-<td align="right">2</td>
-<td align="right">即idea中Fieldref常量项</td>
-</tr>
-<tr>
-<td align="right">00 03</td>
-<td align="right">3</td>
-<td align="right">索引，表示类名</td>
-</tr>
-<tr>
-<td align="right">00 15</td>
-<td align="right">21</td>
-<td align="right">索引，表示属性描述符</td>
-</tr>
-<tr>
-<td align="right">第三个变量</td>
-<td align="right"></td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">07</td>
-<td align="right">3</td>
-<td align="right">Class常量项</td>
-</tr>
-<tr>
-<td align="right">00 16</td>
-<td align="right">22</td>
-<td align="right">索引</td>
-</tr>
-<tr>
-<td align="right">第四个变量</td>
-<td align="right"></td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">07</td>
-<td align="right">4</td>
-<td align="right">Class常量项</td>
-</tr>
-<tr>
-<td align="right">00 17</td>
-<td align="right">23</td>
-<td align="right">索引</td>
-</tr>
-<tr>
-<td align="right">第五个变量</td>
-<td align="right"></td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">01</td>
-<td align="right">5</td>
-<td align="right">字符串常量</td>
-</tr>
-<tr>
-<td align="right">00 01</td>
-<td align="right">没有对应</td>
-<td align="right">占用字节数</td>
-</tr>
-<tr>
-<td align="right">61</td>
-<td align="right">a</td>
-<td align="right">字符串字节码，长度为占用字节数，编码为utf-8</td>
-</tr>
-<tr>
-<td align="right">下面常量池分析类似</td>
-<td align="right"></td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">## 类的访问修饰符 ##</td>
-<td align="right"></td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right"><img src="https://img-blog.csdn.net/20180804141459924?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d6cTY1Nzg3MDI=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" width="50%" height="50%" /></td>
-<td align="right"></td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">从00 21 开始就是访问修饰符：00 21 我们在类的字段访问标志里边找不到，那是因为00 21是由0x0001</td>
-<td align="right">0x0020=0x0021得到的，即，java不会穷举所有的访问修饰组合，而是用并集的方式得到的。当前表示我们的MyTest1是一个acc_public和acc_super。</td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">## 类名</td>
-<td align="right"></td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">00 03 对应常量池中的3,即com/hehe/Bytecode/Mytest1</td>
-<td align="right"></td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">## 父类名</td>
-<td align="right"></td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">00 04 对应常量池中的4,即java/lang/Object</td>
-<td align="right"></td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">## 接口个数</td>
-<td align="right"></td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">00 00 没有接口，也没接口名</td>
-<td align="right"></td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">## 字段个数</td>
-<td align="right"></td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">00 01 表示属性个数</td>
-<td align="right"></td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">## 字段表</td>
-<td align="right"></td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">由字段修饰符(public，private，vollatile)等对应表16进制并操作+字段名+字段描述符+属性个数+属性表</td>
-<td align="right"></td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">00 02</td>
-<td align="right">access_flags表示修饰符(private) 具体查表看书</td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">00 05</td>
-<td align="right">name_index 表示常量池中的字段名</td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">00 06</td>
-<td align="right">descriptor_index表示常量池的属性描述符</td>
-<td align="right">Ljava/lang/String;</td>
-</tr>
-<tr>
-<td align="right">00 00</td>
-<td align="right">attributes_count表示没有额外属性</td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">## 方法表个数</td>
-<td align="right"></td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">00 03 表示有3个方法</td>
-<td align="right"></td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">## 方法表</td>
-<td align="right"></td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">和字段表类似</td>
-<td align="right"></td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">以下是构造函数的字节码</td>
-<td align="right"></td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">由字段修饰符(public，private，synchronized,abstrast)等对应表16进制并操作+方法名+方法描述符+属性个数+属性表</td>
-<td align="right"></td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">00 01</td>
-<td align="right">access_flags 表示public</td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">00 07</td>
-<td align="right">name_index表示方法名, <init>构造函数</td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">00 08</td>
-<td align="right">descriptor_index表示方法描述符，()V</td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">00 01</td>
-<td align="right">attributes_count表示方法属性个数</td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">00 09</td>
-<td align="right">attributes_name_index表示code属性，表示字节码指令，属性名字</td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">00 00 00 2F</td>
-<td align="right">attributes_length 表示指令长度,多少条指令</td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">00 01</td>
-<td align="right">max_stack最大操作数栈的深度为1</td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">00 01</td>
-<td align="right">max_locals局部表量存储空间，单位为slot为4个字节，基本数据类型除了double和long都分配1slot空间，long和double为2slot</td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">00 00 00 05</td>
-<td align="right">code_length表示code长度</td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">2A B7 00 0A B1</td>
-<td align="right">code指令，代表方法代码二进制指令</td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">00 00</td>
-<td align="right">exception_table_length异常表长度为0</td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">00 02</td>
-<td align="right">attributes 属性数量，表示两个属性</td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">00 0A</td>
-<td align="right">attributes_name_index属性名称索引指向常量表，LineNumberTable属性为java和class行号对应关系</td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">00 00 00 06</td>
-<td align="right">attributes_length属性长度为6</td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">00 01 00 00 00 03</td>
-<td align="right">代表java文件和class文件的具体行号映射关系</td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">00 0B</td>
-<td align="right">属性名字索引，指向常量池， LocalVariableTable，代表局部变量表和java文件关系</td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">00 00 00 0C</td>
-<td align="right">属性长度为12</td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">00 01</td>
-<td align="right">局部变量个数 1个</td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">00 00</td>
-<td align="right">字节码偏移量</td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">00 05</td>
-<td align="right">变量长度，上面两个结合就是字节码文件作用域</td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">00 0C</td>
-<td align="right">name_index变量名字，this</td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">00 0D</td>
-<td align="right">变量类型 descriptor_index</td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">00 00</td>
-<td align="right">表示在局部变量表中slot出现位置</td>
-<td align="right"></td>
-</tr>
-<tr>
-<td align="right">空构造函数中args_size=1，是有关键字this作为参数，所以方法参数为1，而不是0</td>
-<td align="right"></td>
-<td align="right"></td>
-</tr>
-</tbody></table>
-<hr>
-<h2 id="以上Mytest1字节码几乎解析完毕"><a href="#以上Mytest1字节码几乎解析完毕" class="headerlink" title=" 以上Mytest1字节码几乎解析完毕"></a> 以上Mytest1字节码几乎解析完毕</h2><h2 id="下面分析复杂字节码文件"><a href="#下面分析复杂字节码文件" class="headerlink" title="下面分析复杂字节码文件"></a>下面分析复杂字节码文件</h2> <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"> public class Mytest2 &#123;</span><br><span class="line">    private Integer a &#x3D; Integer.valueOf(1);</span><br><span class="line">    private static String b &#x3D; &quot;1&quot;;</span><br><span class="line"></span><br><span class="line">    public Mytest2() &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public synchronized Integer getA() &#123;</span><br><span class="line">        return this.a;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public Mytest2 setA(Integer a) &#123;</span><br><span class="line">        synchronized(this) &#123;</span><br><span class="line">            this.a &#x3D; a;</span><br><span class="line">            return this;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p> javap -verbose分析</p>
- <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br></pre></td><td class="code"><pre><span class="line"> C:\Users\Lenovo\IdeaProjects\JVM\out\production\JVM\com\hehe\Bytecode&gt;javap -verbose Mytest2.class</span><br><span class="line">Classfile &#x2F;C:&#x2F;Users&#x2F;Lenovo&#x2F;IdeaProjects&#x2F;JVM&#x2F;out&#x2F;production&#x2F;JVM&#x2F;com&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest2.class</span><br><span class="line">  Last modified 2020年7月10日; size 850 bytes</span><br><span class="line">  MD5 checksum a556fefa848a19562270280853c65849</span><br><span class="line">  Compiled from &quot;Mytest2.java&quot;</span><br><span class="line">public class com.hehe.Bytecode.Mytest2</span><br><span class="line">  minor version: 0</span><br><span class="line">  major version: 52</span><br><span class="line">  flags: (0x0021) ACC_PUBLIC, ACC_SUPER</span><br><span class="line">  this_class: #6                          &#x2F;&#x2F; com&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest2</span><br><span class="line">  super_class: #7                         &#x2F;&#x2F; java&#x2F;lang&#x2F;Object</span><br><span class="line">  interfaces: 0, fields: 2, methods: 4, attributes: 1</span><br><span class="line">Constant pool:</span><br><span class="line">   #1 &#x3D; Methodref          #7.#31         &#x2F;&#x2F; java&#x2F;lang&#x2F;Object.&quot;&lt;init&gt;&quot;:()V</span><br><span class="line">   #2 &#x3D; Methodref          #32.#33        &#x2F;&#x2F; java&#x2F;lang&#x2F;Integer.valueOf:(I)Ljava&#x2F;lang&#x2F;Integer;</span><br><span class="line">   #3 &#x3D; Fieldref           #6.#34         &#x2F;&#x2F; com&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest2.a:Ljava&#x2F;lang&#x2F;Integer;</span><br><span class="line">   #4 &#x3D; String             #35            &#x2F;&#x2F; 1</span><br><span class="line">   #5 &#x3D; Fieldref           #6.#36         &#x2F;&#x2F; com&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest2.b:Ljava&#x2F;lang&#x2F;String;</span><br><span class="line">   #6 &#x3D; Class              #37            &#x2F;&#x2F; com&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest2</span><br><span class="line">   #7 &#x3D; Class              #38            &#x2F;&#x2F; java&#x2F;lang&#x2F;Object</span><br><span class="line">   #8 &#x3D; Utf8               a</span><br><span class="line">   #9 &#x3D; Utf8               Ljava&#x2F;lang&#x2F;Integer;</span><br><span class="line">  #10 &#x3D; Utf8               b</span><br><span class="line">  #11 &#x3D; Utf8               Ljava&#x2F;lang&#x2F;String;</span><br><span class="line">  #12 &#x3D; Utf8               &lt;init&gt;</span><br><span class="line">  #13 &#x3D; Utf8               ()V</span><br><span class="line">  #14 &#x3D; Utf8               Code</span><br><span class="line">  #15 &#x3D; Utf8               LineNumberTable</span><br><span class="line">  #16 &#x3D; Utf8               LocalVariableTable</span><br><span class="line">  #17 &#x3D; Utf8               this</span><br><span class="line">  #18 &#x3D; Utf8               Lcom&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest2;</span><br><span class="line">  #19 &#x3D; Utf8               getA</span><br><span class="line">  #20 &#x3D; Utf8               ()Ljava&#x2F;lang&#x2F;Integer;</span><br><span class="line">  #21 &#x3D; Utf8               setA</span><br><span class="line">  #22 &#x3D; Utf8               (Ljava&#x2F;lang&#x2F;Integer;)Lcom&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest2;</span><br><span class="line">  #23 &#x3D; Utf8               StackMapTable</span><br><span class="line">  #24 &#x3D; Class              #37            &#x2F;&#x2F; com&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest2</span><br><span class="line">  #25 &#x3D; Class              #39            &#x2F;&#x2F; java&#x2F;lang&#x2F;Integer</span><br><span class="line">  #26 &#x3D; Class              #38            &#x2F;&#x2F; java&#x2F;lang&#x2F;Object</span><br><span class="line">  #27 &#x3D; Class              #40            &#x2F;&#x2F; java&#x2F;lang&#x2F;Throwable</span><br><span class="line">  #28 &#x3D; Utf8               &lt;clinit&gt;</span><br><span class="line">  #29 &#x3D; Utf8               SourceFile</span><br><span class="line">  #30 &#x3D; Utf8               Mytest2.java</span><br><span class="line">  #31 &#x3D; NameAndType        #12:#13        &#x2F;&#x2F; &quot;&lt;init&gt;&quot;:()V</span><br><span class="line">  #32 &#x3D; Class              #39            &#x2F;&#x2F; java&#x2F;lang&#x2F;Integer</span><br><span class="line">  #33 &#x3D; NameAndType        #41:#42        &#x2F;&#x2F; valueOf:(I)Ljava&#x2F;lang&#x2F;Integer;</span><br><span class="line">  #34 &#x3D; NameAndType        #8:#9          &#x2F;&#x2F; a:Ljava&#x2F;lang&#x2F;Integer;</span><br><span class="line">  #35 &#x3D; Utf8               1</span><br><span class="line">  #36 &#x3D; NameAndType        #10:#11        &#x2F;&#x2F; b:Ljava&#x2F;lang&#x2F;String;</span><br><span class="line">  #37 &#x3D; Utf8               com&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest2</span><br><span class="line">  #38 &#x3D; Utf8               java&#x2F;lang&#x2F;Object</span><br><span class="line">  #39 &#x3D; Utf8               java&#x2F;lang&#x2F;Integer</span><br><span class="line">  #40 &#x3D; Utf8               java&#x2F;lang&#x2F;Throwable</span><br><span class="line">  #41 &#x3D; Utf8               valueOf</span><br><span class="line">  #42 &#x3D; Utf8               (I)Ljava&#x2F;lang&#x2F;Integer;</span><br><span class="line">&#123;</span><br><span class="line">  public com.hehe.Bytecode.Mytest2();</span><br><span class="line">    descriptor: ()V</span><br><span class="line">    flags: (0x0001) ACC_PUBLIC</span><br><span class="line">    Code:</span><br><span class="line">      stack&#x3D;2, locals&#x3D;1, args_size&#x3D;1</span><br><span class="line">         0: aload_0</span><br><span class="line">         1: invokespecial #1                  &#x2F;&#x2F; Method java&#x2F;lang&#x2F;Object.&quot;&lt;init&gt;&quot;:()V</span><br><span class="line">         4: aload_0</span><br><span class="line">         5: iconst_1</span><br><span class="line">         6: invokestatic  #2                  &#x2F;&#x2F; Method java&#x2F;lang&#x2F;Integer.valueOf:(I)Ljava&#x2F;lang&#x2F;Integer;</span><br><span class="line">         9: putfield      #3                  &#x2F;&#x2F; Field a:Ljava&#x2F;lang&#x2F;Integer;</span><br><span class="line">        12: return</span><br><span class="line">      LineNumberTable:</span><br><span class="line">        line 3: 0</span><br><span class="line">        line 4: 4</span><br><span class="line">      LocalVariableTable:</span><br><span class="line">        Start  Length  Slot  Name   Signature</span><br><span class="line">            0      13     0  this   Lcom&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest2;</span><br><span class="line"></span><br><span class="line">  public synchronized java.lang.Integer getA();</span><br><span class="line">    descriptor: ()Ljava&#x2F;lang&#x2F;Integer;</span><br><span class="line">    flags: (0x0021) ACC_PUBLIC, ACC_SYNCHRONIZED</span><br><span class="line">    Code:</span><br><span class="line">      stack&#x3D;1, locals&#x3D;1, args_size&#x3D;1</span><br><span class="line">         0: aload_0</span><br><span class="line">         1: getfield      #3                  &#x2F;&#x2F; Field a:Ljava&#x2F;lang&#x2F;Integer;</span><br><span class="line">         4: areturn</span><br><span class="line">      LineNumberTable:</span><br><span class="line">        line 8: 0</span><br><span class="line">      LocalVariableTable:</span><br><span class="line">        Start  Length  Slot  Name   Signature</span><br><span class="line">            0       5     0  this   Lcom&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest2;</span><br><span class="line"></span><br><span class="line">  public com.hehe.Bytecode.Mytest2 setA(java.lang.Integer);</span><br><span class="line">    descriptor: (Ljava&#x2F;lang&#x2F;Integer;)Lcom&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest2;</span><br><span class="line">    flags: (0x0001) ACC_PUBLIC</span><br><span class="line">    Code:</span><br><span class="line">      stack&#x3D;2, locals&#x3D;4, args_size&#x3D;2</span><br><span class="line">         0: aload_0</span><br><span class="line">         1: dup</span><br><span class="line">         2: astore_2</span><br><span class="line">         3: monitorenter</span><br><span class="line">         4: aload_0</span><br><span class="line">         5: aload_1</span><br><span class="line">         6: putfield      #3                  &#x2F;&#x2F; Field a:Ljava&#x2F;lang&#x2F;Integer;</span><br><span class="line">         9: aload_0</span><br><span class="line">        10: aload_2</span><br><span class="line">        11: monitorexit</span><br><span class="line">        12: areturn</span><br><span class="line">        13: astore_3</span><br><span class="line">        14: aload_2</span><br><span class="line">        15: monitorexit</span><br><span class="line">        16: aload_3</span><br><span class="line">        17: athrow</span><br><span class="line">      Exception table:</span><br><span class="line">         from    to  target type</span><br><span class="line">             4    12    13   any</span><br><span class="line">            13    16    13   any</span><br><span class="line">      LineNumberTable:</span><br><span class="line">        line 12: 0</span><br><span class="line">        line 13: 4</span><br><span class="line">        line 14: 9</span><br><span class="line">        line 15: 13</span><br><span class="line">      LocalVariableTable:</span><br><span class="line">        Start  Length  Slot  Name   Signature</span><br><span class="line">            0      18     0  this   Lcom&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest2;</span><br><span class="line">            0      18     1     a   Ljava&#x2F;lang&#x2F;Integer;</span><br><span class="line">      StackMapTable: number_of_entries &#x3D; 1</span><br><span class="line">        frame_type &#x3D; 255 &#x2F;* full_frame *&#x2F;</span><br><span class="line">          offset_delta &#x3D; 13</span><br><span class="line">          locals &#x3D; [ class com&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest2, class java&#x2F;lang&#x2F;Integer, class java&#x2F;lang&#x2F;Object ]</span><br><span class="line">          stack &#x3D; [ class java&#x2F;lang&#x2F;Throwable ]</span><br><span class="line"></span><br><span class="line">  static &#123;&#125;;</span><br><span class="line">    descriptor: ()V</span><br><span class="line">    flags: (0x0008) ACC_STATIC</span><br><span class="line">    Code:</span><br><span class="line">      stack&#x3D;1, locals&#x3D;0, args_size&#x3D;0</span><br><span class="line">         0: ldc           #4                  &#x2F;&#x2F; String 1</span><br><span class="line">         2: putstatic     #5                  &#x2F;&#x2F; Field b:Ljava&#x2F;lang&#x2F;String;</span><br><span class="line">         5: return</span><br><span class="line">      LineNumberTable:</span><br><span class="line">        line 5: 0</span><br><span class="line">&#125;</span><br><span class="line">SourceFile: &quot;Mytest2.java&quot;</span><br></pre></td></tr></table></figure>
-
-<p> 可以得出以下结论<br> 1.每个方法的的参数至少是一个，必然有this作为该方法参数<br> 2.成员属性的初始化是在构造函数中建立的，即对象创建才被初始化，而不是类的初始化<br> 3.类的属性是在隐含静态代码块中被初始化的，字段不会自己初始化的.<br> 4.同步方法的synchronized,被标记在方法修饰符中。<br> 5.同步代码块的实质就是争夺锁对象的moniter，获得锁时指令是moniterenter,释放锁指令是moiterexit<br> 释放锁指令有多条是为了保证异常情况也可以顺利释放锁</p>
-<h2 id="带异常的字节码"><a href="#带异常的字节码" class="headerlink" title="带异常的字节码"></a>带异常的字节码</h2> <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">public class Mytest3 &#123;</span><br><span class="line">    public int test()&#123;</span><br><span class="line">        int x;</span><br><span class="line">        try &#123;</span><br><span class="line">            x&#x3D;1;</span><br><span class="line">            return x;</span><br><span class="line">        &#125;</span><br><span class="line">        catch (Exception e)&#123;</span><br><span class="line">            x&#x3D;4;</span><br><span class="line">            return x;</span><br><span class="line">        &#125;finally &#123;</span><br><span class="line">            x&#x3D;3;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p> 字节码文件:<br> <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br></pre></td><td class="code"><pre><span class="line"> Classfile &#x2F;C:&#x2F;Users&#x2F;Lenovo&#x2F;IdeaProjects&#x2F;JVM&#x2F;out&#x2F;production&#x2F;JVM&#x2F;com&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest3.class</span><br><span class="line">  Last modified 2020年7月10日; size 608 bytes</span><br><span class="line">  MD5 checksum 638cb24900c673a1055999b28d37873e</span><br><span class="line">  Compiled from &quot;Mytest3.java&quot;</span><br><span class="line">public class com.hehe.Bytecode.Mytest3</span><br><span class="line">  minor version: 0</span><br><span class="line">  major version: 52</span><br><span class="line">  flags: (0x0021) ACC_PUBLIC, ACC_SUPER</span><br><span class="line">  this_class: #3                          &#x2F;&#x2F; com&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest3</span><br><span class="line">  super_class: #4                         &#x2F;&#x2F; java&#x2F;lang&#x2F;Object</span><br><span class="line">  interfaces: 0, fields: 0, methods: 2, attributes: 1</span><br><span class="line">Constant pool:</span><br><span class="line">   #1 &#x3D; Methodref          #4.#23         &#x2F;&#x2F; java&#x2F;lang&#x2F;Object.&quot;&lt;init&gt;&quot;:()V</span><br><span class="line">   #2 &#x3D; Class              #24            &#x2F;&#x2F; java&#x2F;lang&#x2F;Exception</span><br><span class="line">   #3 &#x3D; Class              #25            &#x2F;&#x2F; com&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest3</span><br><span class="line">   #4 &#x3D; Class              #26            &#x2F;&#x2F; java&#x2F;lang&#x2F;Object</span><br><span class="line">   #5 &#x3D; Utf8               &lt;init&gt;</span><br><span class="line">   #6 &#x3D; Utf8               ()V</span><br><span class="line">   #7 &#x3D; Utf8               Code</span><br><span class="line">   #8 &#x3D; Utf8               LineNumberTable</span><br><span class="line">   #9 &#x3D; Utf8               LocalVariableTable</span><br><span class="line">  #10 &#x3D; Utf8               this</span><br><span class="line">  #11 &#x3D; Utf8               Lcom&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest3;</span><br><span class="line">  #12 &#x3D; Utf8               test</span><br><span class="line">  #13 &#x3D; Utf8               ()I</span><br><span class="line">  #14 &#x3D; Utf8               x</span><br><span class="line">  #15 &#x3D; Utf8               I</span><br><span class="line">  #16 &#x3D; Utf8               e</span><br><span class="line">  #17 &#x3D; Utf8               Ljava&#x2F;lang&#x2F;Exception;</span><br><span class="line">  #18 &#x3D; Utf8               StackMapTable</span><br><span class="line">  #19 &#x3D; Class              #24            &#x2F;&#x2F; java&#x2F;lang&#x2F;Exception</span><br><span class="line">  #20 &#x3D; Class              #27            &#x2F;&#x2F; java&#x2F;lang&#x2F;Throwable</span><br><span class="line">  #21 &#x3D; Utf8               SourceFile</span><br><span class="line">  #22 &#x3D; Utf8               Mytest3.java</span><br><span class="line">  #23 &#x3D; NameAndType        #5:#6          &#x2F;&#x2F; &quot;&lt;init&gt;&quot;:()V</span><br><span class="line">  #24 &#x3D; Utf8               java&#x2F;lang&#x2F;Exception</span><br><span class="line">  #25 &#x3D; Utf8               com&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest3</span><br><span class="line">  #26 &#x3D; Utf8               java&#x2F;lang&#x2F;Object</span><br><span class="line">  #27 &#x3D; Utf8               java&#x2F;lang&#x2F;Throwable</span><br><span class="line">&#123;</span><br><span class="line">  public com.hehe.Bytecode.Mytest3();</span><br><span class="line">    descriptor: ()V</span><br><span class="line">    flags: (0x0001) ACC_PUBLIC</span><br><span class="line">    Code:</span><br><span class="line">      stack&#x3D;1, locals&#x3D;1, args_size&#x3D;1</span><br><span class="line">         0: aload_0</span><br><span class="line">         1: invokespecial #1                  &#x2F;&#x2F; Method java&#x2F;lang&#x2F;Object.&quot;&lt;init&gt;&quot;:()V</span><br><span class="line">         4: return</span><br><span class="line">      LineNumberTable:</span><br><span class="line">        line 6: 0</span><br><span class="line">      LocalVariableTable:</span><br><span class="line">        Start  Length  Slot  Name   Signature</span><br><span class="line">            0       5     0  this   Lcom&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest3;</span><br><span class="line"></span><br><span class="line">  public int test();</span><br><span class="line">    descriptor: ()I</span><br><span class="line">    flags: (0x0001) ACC_PUBLIC</span><br><span class="line">    Code:</span><br><span class="line">      stack&#x3D;1, locals&#x3D;5, args_size&#x3D;1</span><br><span class="line">         0: iconst_1  &#x2F;&#x2F;、常数1(非数值为1)保存到操作栈中</span><br><span class="line">         1: istore_1  &#x2F;&#x2F;操作栈出栈，常数1存储到局部变量表Slot 1中 slot1&#x3D;1</span><br><span class="line">         2: iload_1  &#x2F;&#x2F;、入栈到操作数栈</span><br><span class="line">         3: istore_2  &#x2F;&#x2F;、出栈到局部变量表中Slot 2位置 slot2&#x3D;1</span><br><span class="line">         4: iconst_3  &#x2F;&#x2F;、将常数3入栈到操作栈</span><br><span class="line">         5: istore_1  &#x2F;&#x2F;出栈将操作栈数保存到slot1,slot1&#x3D;3</span><br><span class="line">         6: iload_2   &#x2F;&#x2F;将局部变量表slot2入栈到操作栈</span><br><span class="line">         7: ireturn   &#x2F;&#x2F;出栈，并返回</span><br><span class="line">         8: astore_2  &#x2F;&#x2F;将异常保存到slot2中</span><br><span class="line">         9: iconst_4  &#x2F;&#x2F;常数4入栈</span><br><span class="line">        10: istore_1  &#x2F;&#x2F;保存到slot1中</span><br><span class="line">        11: iload_1   &#x2F;&#x2F;slot1入栈到操作栈中</span><br><span class="line">        12: istore_3  &#x2F;&#x2F;操作栈数保存到slot3中 slot3&#x3D;4</span><br><span class="line">        13: iconst_3  &#x2F;&#x2F;、将常数3入栈到操作栈</span><br><span class="line">        14: istore_1  &#x2F;&#x2F;出栈将操作栈数保存到slot1,slot1&#x3D;3</span><br><span class="line">        15: iload_3   &#x2F;&#x2F;将局部变量表slot3入栈到操作栈</span><br><span class="line">        16: ireturn   &#x2F;&#x2F;出栈，并返回</span><br><span class="line">        17: astore        4  &#x2F;&#x2F;如果不是Exception和其子类引发程序异常,则把信息保存到slot4中</span><br><span class="line">        19: iconst_3         &#x2F;&#x2F;、将常数3入栈到操作栈</span><br><span class="line">        20: istore_1         &#x2F;&#x2F;出栈将操作栈数保存到slot1,slot1&#x3D;3</span><br><span class="line">        21: aload         4  &#x2F;&#x2F;slot4出栈</span><br><span class="line">        23: athrow           &#x2F;&#x2F;异常抛出</span><br><span class="line">      Exception table:       &#x2F;&#x2F;from是try开始位置，to是try结束位置，target时异常处理位置，type异常处理类型</span><br><span class="line">         from    to  target type</span><br><span class="line">             0     4     8   Class java&#x2F;lang&#x2F;Exception</span><br><span class="line">             0     4    17   any</span><br><span class="line">             8    13    17   any</span><br><span class="line">            17    19    17   any</span><br><span class="line">      LineNumberTable:</span><br><span class="line">        line 10: 0</span><br><span class="line">        line 11: 2</span><br><span class="line">        line 17: 4</span><br><span class="line">        line 11: 6</span><br><span class="line">        line 13: 8</span><br><span class="line">        line 14: 9</span><br><span class="line">        line 15: 11</span><br><span class="line">        line 17: 13</span><br><span class="line">        line 15: 15</span><br><span class="line">        line 17: 17</span><br><span class="line">        line 18: 21</span><br><span class="line">      LocalVariableTable:</span><br><span class="line">        Start  Length  Slot  Name   Signature</span><br><span class="line">            2       6     1     x   I</span><br><span class="line">            9       8     2     e   Ljava&#x2F;lang&#x2F;Exception;</span><br><span class="line">           11       6     1     x   I</span><br><span class="line">            0      24     0  this   Lcom&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest3;</span><br><span class="line">           21       3     1     x   I</span><br><span class="line">      StackMapTable: number_of_entries &#x3D; 2</span><br><span class="line">        frame_type &#x3D; 72 &#x2F;* same_locals_1_stack_item *&#x2F;</span><br><span class="line">          stack &#x3D; [ class java&#x2F;lang&#x2F;Exception ]</span><br><span class="line">        frame_type &#x3D; 72 &#x2F;* same_locals_1_stack_item *&#x2F;</span><br><span class="line">          stack &#x3D; [ class java&#x2F;lang&#x2F;Throwable ]</span><br><span class="line">&#125;</span><br><span class="line">SourceFile: &quot;Mytest3.java&quot;</span><br></pre></td></tr></table></figure><br> 从java文件来看，上面程序结果很简单:<br> 1.如果程序没有异常，则x=1并返回<br> 2.如果程序有问题，是Excption或其子类则程序跳转到catch,x=4并返回<br> 3.如果程序不是Exception或其子类引发问题则，跳转到finally,x=3，返回异常消息</p>
-<p> 从字节码文件来看:<br>  1.如果程序没有异常，则x=1，执行finally,返回1<br>  2.如果程序有问题，是Excption或其子类则程序跳转到catch,x=4,执行finally并返回4<br>  3.如果程序不是Exception或其子类引发问题则，跳转到finally,x=3，返回异常消息</p>
-<p>  也就是说无论try还是catch最后都会执行finally，而执行并不是简单指令跳转，<br>  而是在每一个try,catch的指令后面都加上finally指令</p>
-<h2 id="带throws异常字节码分析"><a href="#带throws异常字节码分析" class="headerlink" title="带throws异常字节码分析"></a>带throws异常字节码分析</h2><p>  方法中多了一个属性exceptions(和code同级),就不上图了</p>
-<h2 id="栈帧的概念与结构"><a href="#栈帧的概念与结构" class="headerlink" title="栈帧的概念与结构"></a>栈帧的概念与结构</h2><p>  栈帧是用于支持虚拟机的方法调用和方法执行数据结构<br>  包括局部变量表，操作栈，动态链接，返回地址<br>  ###局部变量表<br>  局部变量表存储的是静态类型，可以存储基本数据类型和引用对象，第0位是对象关键字this<br>  即solt_0=this;<br>  局部变量表为了节省空间是可以被替换的：<br>  看看一下例子:<br>  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">  public class Mytest4 &#123;</span><br><span class="line">    </span><br><span class="line">    &#x2F;&#x2F;不会被回收，b在gc日志时在局部变量表还是存在</span><br><span class="line">    public void test1()&#123;</span><br><span class="line">        byte[] b&#x3D;new byte[1024];</span><br><span class="line">        System.gc();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;不会被回收，b在gc日志时在局部变量表还是存在，虽然b的作用域已经结束，但需要被其他局部变量取代b在局部变量表中位置</span><br><span class="line">    public void test2()&#123;</span><br><span class="line">        &#123;</span><br><span class="line">            byte[] b &#x3D; new byte[1024];</span><br><span class="line">        &#125;</span><br><span class="line">        System.gc();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    &#x2F;&#x2F;被回收，b作用域结束后，b在局部表量表中的位置被a取代</span><br><span class="line">    public void test3()&#123;</span><br><span class="line">        &#123;</span><br><span class="line">            byte[] b &#x3D; new byte[1024];</span><br><span class="line">        &#125;</span><br><span class="line">        int a&#x3D;1;</span><br><span class="line">        System.gc();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h3 id="操作数栈"><a href="#操作数栈" class="headerlink" title="操作数栈"></a>操作数栈</h3><p>  指令执行的引擎，java基于栈指令集做操作，所以可以跨平台，计算处于内存中，速度慢，而寄存器指令集运行在寄存器中<br>  需要硬件，速度快，不利于跨平台<br>  字节码是基于栈指令集<br>  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">  public class Mytest7 &#123;</span><br><span class="line"></span><br><span class="line">    public int calc()&#123;</span><br><span class="line">        int a&#x3D;100;</span><br><span class="line">        int b&#x3D;200;</span><br><span class="line">        int c&#x3D;300;</span><br><span class="line">        return (a+b)*c;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">  </span><br><span class="line">  public int calc();</span><br><span class="line">    descriptor: ()I</span><br><span class="line">    flags: (0x0001) ACC_PUBLIC</span><br><span class="line">    Code:</span><br><span class="line">      stack&#x3D;2, locals&#x3D;4, args_size&#x3D;1</span><br><span class="line">         0: bipush        100  &#x2F;&#x2F;100入栈</span><br><span class="line">         2: istore_1           &#x2F;&#x2F;出栈保存到局部变量表slot1</span><br><span class="line">         3: sipush        200  &#x2F;&#x2F;200入栈</span><br><span class="line">         6: istore_2           &#x2F;&#x2F;出栈保存到局部变量表slot2</span><br><span class="line">         7: sipush        300  &#x2F;&#x2F;300入栈</span><br><span class="line">        10: istore_3            &#x2F;&#x2F;出栈保存到局部变量表slot3</span><br><span class="line">        11: iload_1             &#x2F;&#x2F;将局部变量表slot1入栈</span><br><span class="line">        12: iload_2             &#x2F;&#x2F;将局部变量表slot2入栈</span><br><span class="line">        13: iadd                &#x2F;&#x2F;相加，并入栈</span><br><span class="line">        14: iload_3             &#x2F;&#x2F;将局部变量表slot3入栈</span><br><span class="line">        15: imul                &#x2F;&#x2F;相乘，并入栈</span><br><span class="line">        16: ireturn             &#x2F;&#x2F;放回，出栈</span><br><span class="line">      LineNumberTable:</span><br><span class="line">        line 6: 0</span><br><span class="line">        line 7: 3</span><br><span class="line">        line 8: 7</span><br><span class="line">        line 9: 11</span><br><span class="line">      LocalVariableTable:</span><br><span class="line">        Start  Length  Slot  Name   Signature</span><br><span class="line">            0      17     0  this   Lcom&#x2F;hehe&#x2F;Bytecode&#x2F;Mytest7;</span><br><span class="line">            3      14     1     a   I</span><br><span class="line">            7      10     2     b   I</span><br><span class="line">           11       6     3     c   I</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="动态链接"><a href="#动态链接" class="headerlink" title="动态链接"></a>动态链接</h3><p>  在运行期间，将方法调用符号引用转为直接引用，称为动态链接，多态里面用</p>
-<h3 id="方法返回地址"><a href="#方法返回地址" class="headerlink" title="方法返回地址"></a>方法返回地址</h3><p>  正常返回和异常返回</p>
-<h2 id="方法调用字节码解析"><a href="#方法调用字节码解析" class="headerlink" title="方法调用字节码解析"></a>方法调用字节码解析</h2><p>  所有方法调用一开始都是在常量池中的符号引用，但一些特殊方法在编译期已经是可以知道的，例如静态方法<br>  和私有方法(不能被重写),还有构造函数，这些方法在编译期完全确定的，可以直接把符号引用变为直接引用<br>  调用指令字节码:<br>  1.invokespecial:调用构造函数<br>  2.invokestatic:调用静态方法<br>  3.invokevirtual:调用虚方法<br>  4.invokeinterface:调用接口方法</p>
-<h3 id="静态分派-重载实现"><a href="#静态分派-重载实现" class="headerlink" title="静态分派(重载实现)"></a>静态分派(重载实现)</h3>  <figure class="highlight plain"><figcaption><span>class Mytest5 &#123;</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">    public void say(human human)&#123;</span><br><span class="line">        System.out.println(&quot;humen say&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void say(men men)&#123;</span><br><span class="line">        System.out.println(&quot;men say&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    public void say(women women)&#123;</span><br><span class="line">        System.out.println(&quot;women say&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Mytest5 mytest5&#x3D;new Mytest5();</span><br><span class="line">       human human&#x3D;new men();</span><br><span class="line">       human human1&#x3D;new women();</span><br><span class="line">       mytest5.say(human);</span><br><span class="line">       mytest5.say(human1);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"> class human&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class men extends human&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class women extends human&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>  打印结果<br>  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">humen say</span><br><span class="line">humen say</span><br></pre></td></tr></table></figure></p>
-<p>  分析:<br>  human human=new man();<br>  human是静态类型，存储到局部变量表，而man是实际类型存储到堆内存中<br>  静态类型在编译期是可以知道的，而实际类型是不知道的，只能在运行期才可以知道<br>  实际类型并调用方法，而在重载过程中，在编译是是已经确定好的，javac在编译时候会<br>  根据参数类型去决定使用哪个重载版本，所以上面例子调用的参数为humen的方法，而不是men和women</p>
-<h3 id="动态分派-重写实现"><a href="#动态分派-重写实现" class="headerlink" title="动态分派(重写实现)"></a>动态分派(重写实现)</h3>  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">  public class Mytest6 &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        fruit fruit&#x3D;new apple();</span><br><span class="line">        fruit.eat();</span><br><span class="line">        fruit&#x3D;new orange();</span><br><span class="line">        fruit.eat();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class fruit&#123;</span><br><span class="line">    public void eat()&#123;</span><br><span class="line">        System.out.println(&quot;eat fruit&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">class apple extends fruit&#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void eat() &#123;</span><br><span class="line">        System.out.println(&quot;eat apple&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class orange extends fruit&#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void eat() &#123;</span><br><span class="line">        System.out.println(&quot;eat orange&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>  结果<br>  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">eat apple</span><br><span class="line">eat orange</span><br></pre></td></tr></table></figure></p>
-  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">public static void main(java.lang.String[]);</span><br><span class="line"> descriptor: ([Ljava&#x2F;lang&#x2F;String;)V</span><br><span class="line"> flags: (0x0009) ACC_PUBLIC, ACC_STATIC</span><br><span class="line"> Code:</span><br><span class="line">   stack&#x3D;2, locals&#x3D;2, args_size&#x3D;1</span><br><span class="line">      0: new           #2                  &#x2F;&#x2F; class com&#x2F;hehe&#x2F;Bytecode&#x2F;apple</span><br><span class="line">      3: dup</span><br><span class="line">      4: invokespecial #3                  &#x2F;&#x2F; Method com&#x2F;hehe&#x2F;Bytecode&#x2F;apple.&quot;&lt;init&gt;&quot;:()V</span><br><span class="line">      7: astore_1</span><br><span class="line">      8: aload_1</span><br><span class="line">      9: invokevirtual #4                  &#x2F;&#x2F; Method com&#x2F;hehe&#x2F;Bytecode&#x2F;fruit.eat:()V</span><br><span class="line">     12: new           #5                  &#x2F;&#x2F; class com&#x2F;hehe&#x2F;Bytecode&#x2F;orange</span><br><span class="line">     15: dup</span><br><span class="line">     16: invokespecial #6                  &#x2F;&#x2F; Method com&#x2F;hehe&#x2F;Bytecode&#x2F;orange.&quot;&lt;init&gt;&quot;:()V</span><br><span class="line">     19: astore_1</span><br><span class="line">     20: aload_1</span><br><span class="line">     21: invokevirtual #4                  &#x2F;&#x2F; Method com&#x2F;hehe&#x2F;Bytecode&#x2F;fruit.eat:()V</span><br><span class="line">     24: return</span><br></pre></td></tr></table></figure>
-<p>  从字节码来看其实实际还是调用Method com/hehe/Bytecode/fruit.eat:()V，但invokevirtual指令解析可以分以下步骤:<br>  1找到栈顶元素的实际类型，记做c<br>  2在c中找到符号类型相同的方法描述符和方法名字，如果匹配则调用该方法，如果没有找到c的父类，令c=c的父类，重复执行2</p>
-<p>  以上是方法重写的实质</p>
-<p>  方法搜索优化:<br>  如果找不到相同的方法描述符和方法名字去找父类，如此重复找会影响性能，一般情况下，在类加载后会在方法区就会建立<br>  一个虚方法表，记录方法入口地址，这个虚方法表是为实际类型服务的，而不是静态类型，例如上述例子apple中的eat将会指向自己的<br>  重写的eat()方法，像toString的一些方法apple并没有去重写，则apple.toString()方法将会指向Objectd的toString()方法。<br>  如果fruit fruit=new apple(),通过虚方法表调用fruit.toString()方法将会直接调用(即Object的方法)，而不会去判断apple是否重写toString方法</p>
+<p>释放锁逻辑<br><img src="https://images2018.cnblogs.com/blog/1422237/201808/1422237-20180805184348967-1221850147.png" width="50%" height="50%" /></p>
+<h2 id="公平锁的加锁"><a href="#公平锁的加锁" class="headerlink" title="公平锁的加锁"></a>公平锁的加锁</h2><h3 id="公平锁的tryAcquire-int-acquires-方法"><a href="#公平锁的tryAcquire-int-acquires-方法" class="headerlink" title="公平锁的tryAcquire(int acquires)方法"></a>公平锁的tryAcquire(int acquires)方法</h3><p>和公平锁类似，不过在获取锁前要判断hasQueuedPredecessors()是否需要排队，如果要排队则返回fasle,执行插入到队列的逻辑</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">protected final boolean tryAcquire(int acquires) &#123;</span><br><span class="line">          final Thread current &#x3D; Thread.currentThread();</span><br><span class="line">          int c &#x3D; getState();</span><br><span class="line">          if (c &#x3D;&#x3D; 0) &#123;</span><br><span class="line">              if (!hasQueuedPredecessors() &amp;&amp;</span><br><span class="line">                  compareAndSetState(0, acquires)) &#123;</span><br><span class="line">                  setExclusiveOwnerThread(current);</span><br><span class="line">                  return true;</span><br><span class="line">              &#125;</span><br><span class="line">          &#125;</span><br><span class="line">          else if (current &#x3D;&#x3D; getExclusiveOwnerThread()) &#123;</span><br><span class="line">              int nextc &#x3D; c + acquires;</span><br><span class="line">              if (nextc &lt; 0)</span><br><span class="line">                  throw new Error(&quot;Maximum lock count exceeded&quot;);</span><br><span class="line">              setState(nextc);</span><br><span class="line">              return true;</span><br><span class="line">          &#125;</span><br><span class="line">          return false;</span><br><span class="line">      &#125;</span><br></pre></td></tr></table></figure>
+<p>是否需要排队，则要和第二个节点竞争优先级，不是第一个，第一个已经获取锁了      </p>
+<h3 id="hasQueuedPredecessors"><a href="#hasQueuedPredecessors" class="headerlink" title="hasQueuedPredecessors()"></a>hasQueuedPredecessors()</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">public final boolean hasQueuedPredecessors() &#123;</span><br><span class="line">      &#x2F;&#x2F; The correctness of this depends on head being initialized</span><br><span class="line">      &#x2F;&#x2F; before tail and on head.next being accurate if the current</span><br><span class="line">      &#x2F;&#x2F; thread is first in queue.</span><br><span class="line">      Node t &#x3D; tail; &#x2F;&#x2F; Read fields in reverse initialization order</span><br><span class="line">      Node h &#x3D; head;</span><br><span class="line">      Node s;</span><br><span class="line">      return h !&#x3D; t &amp;&amp;</span><br><span class="line">          ((s &#x3D; h.next) &#x3D;&#x3D; null || s.thread !&#x3D; Thread.currentThread());</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>这里分几种情况讨论是否需要入队<br>1.队列为空，h！=t为fasle，则表明不需要排队<br>2.队列有1个元素，h！=t为fasle,也不需要排队<br>3.队列有两个元素。分情况讨论，h!=t为true<br>一种是第二节点并未完全插入((s = h.next) == null)，回顾插入链表顺序是pred=tail,node.pre=tail,tail=tail.next,pre.next=node,此时可能设置尾指针tail=tail.next，但没有做pre.next=node<br>这种情况竞争是新来节点的竞争<br>一种是完全插入,则判断当前节点是否是第二个节点，如果是第二个节点才不需要排队，才有资格去争夺锁，如果不是则没有，这种情况竞争是新来节点和原队列节点</p>
 
       
 
@@ -614,7 +253,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">jvm</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">JDK源码</a>
         		</li>
       		
 		</ul>
@@ -670,7 +309,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2020/07/08/jvm-bytecode/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2020/09/10/ReentrantLock/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -684,18 +323,9 @@
   
 <nav id="article-nav">
   
-    <a href="/2020/09/10/gc/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          gc
-        
-      </div>
-    </a>
   
-  
-    <a href="/2020/07/07/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">Hello World</div>
+    <a href="/2020/09/10/run-memory/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">run-memory</div>
       <i class="icon-circle-right"></i>
     </a>
   
